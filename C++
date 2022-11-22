@@ -1,0 +1,310 @@
+#include <cstdbool>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+
+using namespace std;
+
+
+struct node {
+  int data;
+  int key;
+  struct node *next;
+};
+
+struct node *head = NULL;
+struct node *current = NULL;
+
+// display the list
+void printList() {
+  struct node *ptr = head;
+  cout << "\n[";
+
+  // start from the beginning
+  while (ptr != NULL) {
+    cout << "(" << ptr->key << "," << ptr->data << ") ";
+    ptr = ptr->next;
+  }
+  cout << "]";
+}
+template <typename T>
+// insert link at the first location
+void insert(T key, T data) {
+  // create a link
+  struct node *link = (struct node *)malloc(sizeof(struct node));
+
+  link->key = key;
+  link->data = data;
+
+  // point it to old first node
+  link->next = head;
+
+  // point first to new first node
+  head = link;
+}
+
+// delete first item
+struct node *delete1() {
+
+  // save reference to first link
+  struct node *tempLink = head;
+
+  // mark next to first link as first
+  head = head->next;
+
+  // return the deleted link
+  return tempLink;
+}
+
+// is list empty
+bool empty() { return head == NULL; }
+
+int size() {
+  int size = 0;
+  struct node *current;
+
+  for (current = head; current != NULL; current = current->next) {
+    size++;
+  }
+
+  return size;
+}
+
+template <typename T>
+// find a link with given key
+struct node *find(T key) {
+
+  // start from the first link
+  struct node *current = head;
+
+  // if list is empty
+  if (head == NULL) {
+    return NULL;
+  }
+
+  // navigate through list
+  while (current->key != key) {
+
+    // if it is last node
+    if (current->next == NULL) {
+      return NULL;
+    } else {
+      // go to next link
+      current = current->next;
+    }
+  }
+
+  // if data found, return the current Link
+  return current;
+}
+
+template <typename T>
+// delete a link with given key
+struct node *remove_if(T key) {
+
+  // start from the first link
+  struct node *current = head;
+  struct node *previous = NULL;
+
+  // if list is empty
+  if (head == NULL) {
+    return NULL;
+  }
+
+  // navigate through list
+  while (current->key != key) {
+
+    // if it is last node
+    if (current->next == NULL) {
+      return NULL;
+    } else {
+      // store reference to current link
+      previous = current;
+      // move to next link
+      current = current->next;
+    }
+  }
+
+  // found a match, update the link
+  if (current == head) {
+    // change first to point to next link
+    head = head->next;
+  } else {
+    // bypass the current link
+    previous->next = current->next;
+  }
+
+  return current;
+}
+
+void sort() {
+
+  int i, j, k, tempKey, tempData;
+  struct node *current;
+  struct node *next;
+
+  int size1 = size();
+  k = size1;
+
+  for (i = 0; i < size1 - 1; i++, k--) {
+    current = head;
+    next = head->next;
+
+    for (j = 1; j < k; j++) {
+
+      if (current->data > next->data) {
+        tempData = current->data;
+        current->data = next->data;
+        next->data = tempData;
+
+        tempKey = current->key;
+        current->key = next->key;
+        next->key = tempKey;
+      }
+
+      current = current->next;
+      next = next->next;
+    }
+  }
+}
+
+void reverse(struct node **head_ref) {
+  struct node *prev = NULL;
+  struct node *current = *head_ref;
+  struct node *next;
+
+  while (current != NULL) {
+    next = current->next;
+    current->next = prev;
+    prev = current;
+    current = next;
+  }
+
+  *head_ref = prev;
+}
+
+
+template <typename T>
+void push_front(T key, T data, node **head) {
+  if (*head == NULL) {
+    node *newNode = (node *)malloc(sizeof(node));
+    newNode->data = data;
+    *head = newNode;
+  } else {
+    node *newNode = (node *)malloc(sizeof(node));
+    newNode->key = key;
+    newNode->data = data;
+    newNode->next = *head;
+    *head = newNode;
+  }
+}
+
+template <typename T>
+void push_back(T key, T data, node **head) {
+
+  node *temp = new node;
+  temp->key = key;
+  temp->data = data;
+  temp->next = NULL;
+  if (!*head) { // empty list becomes the new node
+    *head = temp;
+    return;
+  } else { // find last and link the new node
+    node *last = *head;
+    while (last->next)
+      last = last->next;
+    last->next = temp;
+  }
+}
+
+struct node *clear() {
+  while (!empty()) {
+
+    // mark next to first link as first
+    head = head->next;
+  }
+  return head = NULL;
+  // return the deleted link
+}
+
+int main() {
+  insert<char>('a', 100);
+  insert<int>(2, 150);
+  insert(3, 250);
+  insert(4, 110);
+  insert(5, 160);
+  insert(6, 210);
+
+  cout << "This is the original List: ";
+
+  // print list
+  printList();
+
+  while (!empty()) {
+    struct node *temp = delete1();
+    cout << "\nRamoved node:"
+         << "(" << temp->key << "," << temp->data << ") ";
+  }
+
+  cout << "\n\nList after deleting all items by delete(): ";
+  printList();
+  insert<char>('a', 100);
+  insert(2, 150);
+  insert(3, 250);
+  insert(4, 110);
+  insert(5, 160);
+  insert(6, 210);
+
+  cout << "\nRestored List: ";
+  printList();
+  cout << endl;
+
+  struct node *foundLink = find(4);
+
+  if (foundLink != NULL) {
+    cout << "\nElement found: ";
+    cout << "(" << foundLink->key << "," << foundLink->data << ") ";
+    cout << endl;
+  } else {
+    cout << "\nElement not found.";
+  }
+
+  remove_if(4);
+  cout << "\nList after deleting an item: ";
+  printList();
+  cout << endl;
+  foundLink = find('a');
+
+  if (foundLink != NULL) {
+    cout << "\nElement found: ";
+    cout << "(" << foundLink->key << "," << foundLink->data << ") ";
+    cout << endl;
+  } else {
+    cout << "\nElement not found.";
+  }
+
+  cout << endl;
+  sort();
+
+  cout << "List after sorting the data: ";
+  printList();
+
+  cout << "\n\nList after adding the data in front: ";
+  push_front(0, 150, &head);
+  printList();
+
+  cout << "\n\nList after adding the data at the end: ";
+  push_back(7, 350, &head);
+  printList();
+
+  reverse(&head);
+  cout << "\n\nList after reversing the data: ";
+  printList();
+
+  clear();
+  cout << "\n\nList after clearing: ";
+  printList();
+  cout << endl;
+
+  return 0;
+}
